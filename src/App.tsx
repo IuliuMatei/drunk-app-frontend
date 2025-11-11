@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
 import "./App.css";
 import { AuthPage } from "./pages/AuthPage";
 import { Navbar } from "./pages/Navbar";
+import { FeedPage } from "./pages/FeedPage";
+import { UserProfilePage } from "./pages/UserProfilePage";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,37 +26,35 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
   };
 
-  if (loading) return null; // așteptăm verificarea JWT-ului
+  if (loading) return null;
 
   return (
     <BrowserRouter>
-      {isAuthenticated && <Navbar onLogout={handleLogout} />}
+      {isAuthenticated && (
+        <Navbar
+          onLogout={handleLogout}
+          onViewProfile={(username) => (window.location.href = `/profile/${username}`)}
+        />
+      )}
 
       <Routes>
-        {/* Pagina principală (doar dacă e logat) */}
         <Route
           path="/"
           element={
-            isAuthenticated ? (
-              <div style={{ paddingTop: "70px" }}>
-                <h2 style={{ textAlign: "center" }}>Welcome to DrinkApp 🍻</h2>
-              </div>
-            ) : (
-              <Navigate to="/auth" />
-            )
+            isAuthenticated ? <FeedPage /> : <Navigate to="/auth" />
           }
         />
 
-        {/* Pagina de login/register */}
         <Route
           path="/auth"
           element={
-            isAuthenticated ? (
-              <Navigate to="/" />
-            ) : (
-              <AuthPage onLoginSuccess={handleLoginSuccess} />
-            )
+            isAuthenticated ? <Navigate to="/" /> : <AuthPage onLoginSuccess={handleLoginSuccess} />
           }
+        />
+
+        <Route
+          path="/profile/:username"
+          element={isAuthenticated ? <UserProfilePage /> : <Navigate to="/auth" />}
         />
       </Routes>
     </BrowserRouter>

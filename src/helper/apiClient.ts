@@ -1,7 +1,9 @@
 export async function apiFetch(url: string, options: RequestInit = {}) {
   const token = localStorage.getItem("jwt");
 
+  // unificăm tot într-un singur obiect headers
   const headers = {
+    "Content-Type": "application/json",
     ...(options.headers || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
@@ -26,10 +28,6 @@ export const api = {
     apiFetch(url, {
       ...options,
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
       body: body ? JSON.stringify(body) : undefined,
     }),
 };
